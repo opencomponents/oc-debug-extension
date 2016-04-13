@@ -1,9 +1,8 @@
 'use strict';
 
-chrome.runtime.onInstalled.addListener(function(details) {
-    console.log('previousVersion', details.previousVersion);
-});
-
-chrome.tabs.onUpdated.addListener(function(tabId) {
-    chrome.pageAction.show(tabId);
+chrome.runtime.onMessage.addListener(function(msg, sender, response) {
+  switch (msg.type) {
+    case 'UPDATE_BADGE':
+      chrome.browserAction.setBadgeText({text: msg.state.toString(), tabId: sender.tab.id});
+  }
 });

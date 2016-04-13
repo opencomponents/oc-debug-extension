@@ -51,6 +51,7 @@ function updateComponents(msg) {
   });
 }
 
+
 chrome.runtime.onMessage.addListener(function(msg, sender, response) {
   switch (msg.type) {
     case 'GET_COMPONENTS':
@@ -59,3 +60,17 @@ chrome.runtime.onMessage.addListener(function(msg, sender, response) {
       return response({type: 'APPLIED_CONFIG', state: updateComponents(msg)});
   }
 });
+
+document.addEventListener('DOMNodeInserted', function(event) {
+  var numberOfComponents = document.getElementsByTagName('oc-component').length;
+  if (numberOfComponents > 0) {
+    chrome.runtime.sendMessage({type: 'UPDATE_BADGE', state: numberOfComponents});
+  }
+});
+
+(function() {
+  var numberOfComponents = document.getElementsByTagName('oc-component').length;
+  if (numberOfComponents > 0) {
+    chrome.runtime.sendMessage({type: 'UPDATE_BADGE', state: numberOfComponents});
+  }
+})();

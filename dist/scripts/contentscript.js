@@ -106,6 +106,20 @@
 	  }
 	});
 
+	document.addEventListener('DOMNodeInserted', function (event) {
+	  var numberOfComponents = document.getElementsByTagName('oc-component').length;
+	  if (numberOfComponents > 0) {
+	    chrome.runtime.sendMessage({ type: 'UPDATE_BADGE', state: numberOfComponents });
+	  }
+	});
+
+	(function () {
+	  var numberOfComponents = document.getElementsByTagName('oc-component').length;
+	  if (numberOfComponents > 0) {
+	    chrome.runtime.sendMessage({ type: 'UPDATE_BADGE', state: numberOfComponents });
+	  }
+	})();
+
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
