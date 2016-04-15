@@ -92,11 +92,11 @@
 
 	var _OCComponentContainer2 = _interopRequireDefault(_OCComponentContainer);
 
-	var _App = __webpack_require__(410);
+	var _App = __webpack_require__(416);
 
 	var _App2 = _interopRequireDefault(_App);
 
-	var _reducer = __webpack_require__(417);
+	var _reducer = __webpack_require__(423);
 
 	var _reducer2 = _interopRequireDefault(_reducer);
 
@@ -28019,6 +28019,11 @@
 	var REQUEST_COMPONENT = exports.REQUEST_COMPONENT = 'REQUEST_COMPONENT';
 	var REQUEST_COMPONENT_SUCCESS = exports.REQUEST_COMPONENT_SUCCESS = 'REQUEST_COMPONENT_SUCCESS';
 	var REQUEST_COMPONENT_FAILURE = exports.REQUEST_COMPONENT_FAILURE = 'REQUEST_COMPONENT_FAILURE';
+
+	var REQUEST_LOCAL_COMPONENT = exports.REQUEST_LOCAL_COMPONENT = 'REQUEST_LOCAL_COMPONENT';
+	var REQUEST_LOCAL_COMPONENT_SUCCESS = exports.REQUEST_LOCAL_COMPONENT_SUCCESS = 'REQUEST_LOCAL_COMPONENT_SUCCESS';
+	var REQUEST_LOCAL_COMPONENT_FAILURE = exports.REQUEST_LOCAL_COMPONENT_FAILURE = 'REQUEST_LOCAL_COMPONENT_FAILURE';
+
 	var EDIT_PARAMETER = exports.EDIT_PARAMETER = 'EDIT_PARAMETER';
 	var SET_STATE = exports.SET_STATE = 'SET_STATE';
 	var RELOAD = exports.RELOAD = 'RELOAD';
@@ -37835,7 +37840,7 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 
 	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -37867,131 +37872,148 @@
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 	var OCComponentContainer = function (_Component) {
-	    _inherits(OCComponentContainer, _Component);
+	  _inherits(OCComponentContainer, _Component);
 
-	    function OCComponentContainer(props) {
-	        _classCallCheck(this, OCComponentContainer);
+	  function OCComponentContainer(props) {
+	    _classCallCheck(this, OCComponentContainer);
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(OCComponentContainer).call(this, props));
+	    return _possibleConstructorReturn(this, Object.getPrototypeOf(OCComponentContainer).call(this, props));
+	  }
+
+	  _createClass(OCComponentContainer, [{
+	    key: 'componentDidMount',
+	    value: function componentDidMount() {
+	      var _props = this.props;
+	      var dispatch = _props.dispatch;
+	      var baseHref = _props.baseHref;
+	      var version = _props.version;
+	      var metadata = _props.metadata;
+	      var error = _props.error;
+
+	      if (error) {
+	        return;
+	      }
+	      if (metadata == null) {
+	        dispatch((0, _actions.requestComponent)(baseHref + version + '/~info', false));
+	      }
 	    }
+	  }, {
+	    key: 'editParameter',
+	    value: function editParameter() {
+	      var _props2 = this.props;
+	      var name = _props2.name;
+	      var version = _props2.version;
+	      var dispatch = _props2.dispatch;
 
-	    _createClass(OCComponentContainer, [{
-	        key: 'componentDidMount',
-	        value: function componentDidMount() {
-	            var _props = this.props;
-	            var dispatch = _props.dispatch;
-	            var baseHref = _props.baseHref;
-	            var version = _props.version;
-	            var metadata = _props.metadata;
-	            var error = _props.error;
+	      return function (parameter, value) {
+	        dispatch((0, _actions.editParameter)(name, version, parameter, value));
+	      };
+	    }
+	  }, {
+	    key: 'changeVersion',
+	    value: function changeVersion() {
+	      var _this2 = this;
 
-	            if (error) {
-	                return;
-	            }
-	            if (metadata == null) {
-	                dispatch((0, _actions.requestComponent)(baseHref + version + '/~info'));
-	            }
-	        }
-	    }, {
-	        key: 'editParameter',
-	        value: function editParameter() {
-	            var _props2 = this.props;
-	            var name = _props2.name;
-	            var version = _props2.version;
-	            var dispatch = _props2.dispatch;
+	      var _props3 = this.props;
+	      var dispatch = _props3.dispatch;
+	      var baseHref = _props3.baseHref;
 
-	            return function (parameter, value) {
-	                dispatch((0, _actions.editParameter)(name, version, parameter, value));
-	            };
-	        }
-	    }, {
-	        key: 'changeVersion',
-	        value: function changeVersion() {
-	            var _this2 = this;
+	      return function (version) {
+	        _this2.context.router.push('/component/' + _this2.props.name + '/' + version);
+	        dispatch((0, _actions.requestComponent)(baseHref + version + '/~info'));
+	      };
+	    }
+	  }, {
+	    key: 'switchToLocal',
+	    value: function switchToLocal() {
+	      var _this3 = this;
 
-	            var _props3 = this.props;
-	            var dispatch = _props3.dispatch;
-	            var baseHref = _props3.baseHref;
+	      var _props4 = this.props;
+	      var dispatch = _props4.dispatch;
+	      var name = _props4.name;
 
-	            return function (version) {
-	                _this2.context.router.push('/component/' + _this2.props.name + '/' + version);
-	                dispatch((0, _actions.requestComponent)(baseHref + version + '/~info'));
-	            };
-	        }
-	    }, {
-	        key: 'reload',
-	        value: function reload() {
-	            var _props4 = this.props;
-	            var dispatch = _props4.dispatch;
-	            var name = _props4.name;
+	      return function () {
+	        _this3.context.router.push('/component/' + _this3.props.name + '/local');
+	        dispatch((0, _actions.requestLocalComponent)(name));
+	      };
+	    }
+	  }, {
+	    key: 'reload',
+	    value: function reload() {
+	      var _props5 = this.props;
+	      var dispatch = _props5.dispatch;
+	      var name = _props5.name;
 
-	            return function () {
-	                dispatch((0, _actions.reload)(name));
-	            };
-	        }
-	    }, {
-	        key: 'apply',
-	        value: function apply() {
-	            var _props5 = this.props;
-	            var dispatch = _props5.dispatch;
-	            var name = _props5.name;
-	            var version = _props5.version;
-	            var renderedComponent = _props5.renderedComponent;
-	            var baseHref = _props5.baseHref;
+	      return function () {
+	        dispatch((0, _actions.reload)(name));
+	      };
+	    }
+	  }, {
+	    key: 'apply',
+	    value: function apply() {
+	      var _props6 = this.props;
+	      var dispatch = _props6.dispatch;
+	      var name = _props6.name;
+	      var version = _props6.version;
+	      var renderedComponent = _props6.renderedComponent;
+	      var baseHref = _props6.baseHref;
 
-	            return function () {
-	                dispatch((0, _actions.apply)(name, version, renderedComponent, baseHref));
-	            };
-	        }
-	    }, {
-	        key: 'render',
-	        value: function render() {
-	            return _react2.default.createElement(
-	                'div',
-	                { style: { position: 'relative', 'minHeight': '30rem' } },
-	                this.props.metadata === null && _react2.default.createElement(
-	                    'div',
-	                    {
-	                        style: { margin: 0, position: 'absolute', top: '50%', left: '50%', 'marginRight': '-50%' } },
-	                    _react2.default.createElement(_circularProgress2.default, null)
-	                ),
-	                this.props.metadata && this.props.metadata && _react2.default.createElement(_OCComponent2.default, _extends({}, this.props, { editParameter: this.editParameter(),
-	                    reset: this.reload(),
-	                    apply: this.apply(),
-	                    changeVersion: this.changeVersion()
-	                }))
-	            );
-	        }
-	    }]);
+	      return function () {
+	        dispatch((0, _actions.apply)(name, version, renderedComponent, baseHref));
+	      };
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { style: { position: 'relative', 'minHeight': '30rem' } },
+	        this.props.metadata === null && _react2.default.createElement(
+	          'div',
+	          {
+	            style: { margin: 0, position: 'absolute', top: '50%', left: '50%', 'marginRight': '-50%' } },
+	          _react2.default.createElement(_circularProgress2.default, null)
+	        ),
+	        this.props.metadata && this.props.metadata && _react2.default.createElement(_OCComponent2.default, _extends({}, this.props, { editParameter: this.editParameter(),
+	          reset: this.reload(),
+	          apply: this.apply(),
+	          changeVersion: this.changeVersion(),
+	          switchToLocal: this.switchToLocal()
+	        }))
+	      );
+	    }
+	  }]);
 
-	    return OCComponentContainer;
+	  return OCComponentContainer;
 	}(_react.Component);
 
 	OCComponentContainer.propTypes = {
-	    name: _react.PropTypes.string.isRequired,
-	    dispatch: _react.PropTypes.func.isRequired
+	  name: _react.PropTypes.string.isRequired,
+	  dispatch: _react.PropTypes.func.isRequired
 	};
 	OCComponentContainer.contextTypes = {
-	    router: _react.PropTypes.object.isRequired
+	  router: _react.PropTypes.object.isRequired
 	};
 
 	function mapStateToProps(state, ownProps) {
-	    var stateObject = state.toJS();
-	    var name = ownProps.params.component;
-	    var version = ownProps.params.version;
-	    var metadata = null;
-	    if (stateObject[name] && stateObject[name][version]) {
-	        metadata = stateObject[name][version];
-	    }
-	    return {
-	        name: name,
-	        baseHref: stateObject[name].baseHref,
-	        version: version,
-	        renderedComponent: stateObject[name].renderedComponent,
-	        metadata: metadata,
-	        versions: stateObject[name].versions,
-	        error: stateObject.error
-	    };
+	  var stateObject = state.toJS();
+	  var name = ownProps.params.component;
+	  var version = ownProps.params.version;
+	  var metadata = null;
+	  if (stateObject[name] && stateObject[name][version]) {
+	    metadata = stateObject[name][version];
+	  }
+	  return {
+	    name: name,
+	    baseHref: stateObject[name].baseHref,
+	    registryHref: stateObject[name].registryHref,
+	    repository: stateObject[name].repository,
+	    version: version,
+	    renderedComponent: stateObject[name].renderedComponent,
+	    metadata: metadata,
+	    versions: stateObject[name].versions,
+	    error: stateObject.error
+	  };
 	}
 	exports.default = (0, _reactRedux.connect)(mapStateToProps)(OCComponentContainer);
 
@@ -38002,9 +38024,10 @@
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 	exports.requestComponent = requestComponent;
+	exports.requestLocalComponent = requestLocalComponent;
 	exports.reload = reload;
 	exports.apply = apply;
 	exports.editParameter = editParameter;
@@ -38016,41 +38039,52 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function requestComponent(href) {
-	    return {
-	        type: c.REQUEST_COMPONENT,
-	        payload: {
-	            request: {
-	                url: '' + href
-	            }
-	        }
-	    };
+	  return {
+	    type: c.REQUEST_COMPONENT,
+	    payload: {
+	      request: {
+	        url: '' + href
+	      }
+	    }
+	  };
+	}
+
+	function requestLocalComponent(name) {
+	  return {
+	    type: c.REQUEST_LOCAL_COMPONENT,
+	    payload: {
+	      request: {
+	        url: 'http://localhost:3000/' + name + '/~info'
+	      }
+	    }
+	  };
 	}
 
 	function reload(component) {
-	    return {
-	        type: c.RELOAD,
-	        component: component
-	    };
+	  return {
+	    type: c.RELOAD,
+	    component: component
+	  };
 	}
 
 	function apply(name, version, renderedComponent, baseHref) {
-	    return {
-	        type: c.APPLY,
-	        name: name,
-	        version: version,
-	        baseHref: baseHref,
-	        parameters: renderedComponent.parameters
-	    };
+	  return {
+	    type: c.APPLY,
+	    name: name,
+	    version: version,
+	    baseHref: baseHref,
+	    parameters: renderedComponent.parameters
+	  };
 	}
 
 	function editParameter(component, version, parameter, value) {
-	    return {
-	        type: c.EDIT_PARAMETER,
-	        component: component,
-	        version: version,
-	        parameter: parameter,
-	        value: value
-	    };
+	  return {
+	    type: c.EDIT_PARAMETER,
+	    component: component,
+	    version: version,
+	    parameter: parameter,
+	    value: value
+	  };
 	}
 
 /***/ },
@@ -38392,6 +38426,38 @@
 
 	var _divider2 = _interopRequireDefault(_divider);
 
+	var _DropDownMenu = __webpack_require__(396);
+
+	var _DropDownMenu2 = _interopRequireDefault(_DropDownMenu);
+
+	var _toolbar = __webpack_require__(410);
+
+	var _toolbar2 = _interopRequireDefault(_toolbar);
+
+	var _toolbarGroup = __webpack_require__(411);
+
+	var _toolbarGroup2 = _interopRequireDefault(_toolbarGroup);
+
+	var _toolbarSeparator = __webpack_require__(412);
+
+	var _toolbarSeparator2 = _interopRequireDefault(_toolbarSeparator);
+
+	var _toolbarTitle = __webpack_require__(413);
+
+	var _toolbarTitle2 = _interopRequireDefault(_toolbarTitle);
+
+	var _apps = __webpack_require__(414);
+
+	var _apps2 = _interopRequireDefault(_apps);
+
+	var _iconButton = __webpack_require__(356);
+
+	var _iconButton2 = _interopRequireDefault(_iconButton);
+
+	var _iconMenu = __webpack_require__(415);
+
+	var _iconMenu2 = _interopRequireDefault(_iconMenu);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -38410,10 +38476,35 @@
 	  }
 
 	  _createClass(OCComponent, [{
-	    key: 'render',
-	    value: function render() {
+	    key: 'openRegistry',
+	    value: function openRegistry() {
 	      var _this2 = this;
 
+	      return function () {
+	        chrome.tabs.create({ url: _this2.props.registryHref });
+	      };
+	    }
+	  }, {
+	    key: 'openComponent',
+	    value: function openComponent() {
+	      var _this3 = this;
+
+	      return function () {
+	        chrome.tabs.create({ url: '' + _this3.props.baseHref + _this3.props.version + '/~info' });
+	      };
+	    }
+	  }, {
+	    key: 'openRepository',
+	    value: function openRepository() {
+	      var _this4 = this;
+
+	      return function () {
+	        chrome.tabs.create({ url: _this4.props.metadata.repository });
+	      };
+	    }
+	  }, {
+	    key: 'render',
+	    value: function render() {
 	      var parameters = [];
 	      var name = this.props.name;
 	      var registryParameters = this.props.metadata.parameters || {};
@@ -38444,8 +38535,6 @@
 	      registryParameterKeys.forEach(function (key) {
 	        var registryParameter = registryParameters[key];
 	        var providedParameter = providedParameters[key];
-	        var selected = registryParameter.mandatory || providedParameter != null ? true : false;
-	        var selectable = !registryParameter.mandatory;
 
 	        parameters.push(_react2.default.createElement(
 	          _tableRow2.default,
@@ -38467,37 +38556,45 @@
 	          )
 	        ));
 	      });
-	      var versions = [];
-	      this.props.versions.forEach(function (version) {
-	        versions.push(_react2.default.createElement(_menuItem2.default, { key: version, value: version, primaryText: version }));
-	      });
 	      return _react2.default.createElement(
 	        'div',
-	        { style: { 'paddingLeft': 1 + 'rem' } },
+	        null,
 	        _react2.default.createElement(
-	          'div',
+	          _toolbar2.default,
 	          null,
 	          _react2.default.createElement(
-	            'h2',
-	            { style: { float: 'left', 'marginTop': 1.55 + 'rem', 'marginBottom': 0 } },
-	            name
+	            _toolbarGroup2.default,
+	            { firstChild: true, float: 'left' },
+	            _react2.default.createElement(_toolbarTitle2.default, { text: name, style: { paddingLeft: '1rem' } }),
+	            _react2.default.createElement(
+	              _DropDownMenu2.default,
+	              { value: this.props.version },
+	              this.props.versions.map(function (version) {
+	                return _react2.default.createElement(_menuItem2.default, { key: version, value: version, primaryText: version });
+	              })
+	            )
 	          ),
 	          _react2.default.createElement(
-	            _selectField2.default,
-	            {
-	              style: { float: 'right' },
-	              floatingLabelText: 'Version',
-	              value: this.props.version,
-	              onChange: function onChange(_, __, v) {
-	                return _this2.props.changeVersion(v);
-	              }
-	            },
-	            versions
+	            _toolbarGroup2.default,
+	            { float: 'right' },
+	            _react2.default.createElement(
+	              _iconMenu2.default,
+	              { iconButtonElement: _react2.default.createElement(
+	                  _iconButton2.default,
+	                  { touch: true },
+	                  _react2.default.createElement(_apps2.default, null)
+	                ) },
+	              _react2.default.createElement(_menuItem2.default, { primaryText: 'Switch to Local', onTouchTap: this.props.switchToLocal }),
+	              _react2.default.createElement(_divider2.default, null),
+	              _react2.default.createElement(_menuItem2.default, { primaryText: 'Go to Registry', onTouchTap: this.openRegistry() }),
+	              _react2.default.createElement(_menuItem2.default, { primaryText: 'Go to Component Info', onTouchTap: this.openComponent() }),
+	              _react2.default.createElement(_menuItem2.default, { primaryText: 'Go to Repository', onTouchTap: this.openRepository() })
+	            )
 	          )
 	        ),
 	        _react2.default.createElement(
 	          'div',
-	          { style: { clear: 'both', 'paddingTop': '2rem' } },
+	          { style: { 'paddingLeft': 1 + 'rem' } },
 	          _react2.default.createElement(
 	            _table2.default,
 	            { multiSelectable: false, selectable: false },
@@ -46579,6 +46676,1037 @@
 
 	'use strict';
 
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(11);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _stylePropable = __webpack_require__(284);
+
+	var _stylePropable2 = _interopRequireDefault(_stylePropable);
+
+	var _getMuiTheme = __webpack_require__(311);
+
+	var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+	var Toolbar = _react2.default.createClass({
+	  displayName: 'Toolbar',
+
+	  propTypes: {
+	    /**
+	     * Can be a `ToolbarGroup` to render a group of related items.
+	     */
+	    children: _react2.default.PropTypes.node,
+
+	    /**
+	     * The css class name of the root element.
+	     */
+	    className: _react2.default.PropTypes.string,
+
+	    /**
+	     * Do not apply `desktopGutter` to the `Toolbar`.
+	     */
+	    noGutter: _react2.default.PropTypes.bool,
+
+	    /**
+	     * Override the inline-styles of the root element.
+	     */
+	    style: _react2.default.PropTypes.object
+	  },
+
+	  contextTypes: {
+	    muiTheme: _react2.default.PropTypes.object
+	  },
+	  //for passing default theme context to children
+	  childContextTypes: {
+	    muiTheme: _react2.default.PropTypes.object
+	  },
+
+	  mixins: [_stylePropable2.default],
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      noGutter: false
+	    };
+	  },
+	  getInitialState: function getInitialState() {
+	    return {
+	      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
+	    };
+	  },
+	  getChildContext: function getChildContext() {
+	    return {
+	      muiTheme: this.state.muiTheme
+	    };
+	  },
+
+	  //to update theme inside state whenever a new theme is passed down
+	  //from the parent / owner using context
+	  componentWillReceiveProps: function componentWillReceiveProps(nextProps, nextContext) {
+	    var newMuiTheme = nextContext.muiTheme ? nextContext.muiTheme : this.state.muiTheme;
+	    this.setState({ muiTheme: newMuiTheme });
+	  },
+	  getTheme: function getTheme() {
+	    return this.state.muiTheme.toolbar;
+	  },
+	  getSpacing: function getSpacing() {
+	    return this.state.muiTheme.rawTheme.spacing;
+	  },
+	  getStyles: function getStyles() {
+	    return {
+	      root: {
+	        boxSizing: 'border-box',
+	        WebkitTapHighlightColor: 'rgba(0,0,0,0)',
+	        backgroundColor: this.getTheme().backgroundColor,
+	        height: this.getTheme().height,
+	        width: '100%',
+	        padding: this.props.noGutter ? 0 : '0px ' + this.getSpacing().desktopGutter + 'px'
+	      }
+	    };
+	  },
+	  render: function render() {
+	    var _props = this.props;
+	    var children = _props.children;
+	    var className = _props.className;
+	    var style = _props.style;
+
+	    var other = _objectWithoutProperties(_props, ['children', 'className', 'style']);
+
+	    var styles = this.getStyles();
+
+	    return _react2.default.createElement(
+	      'div',
+	      _extends({}, other, { className: className, style: this.prepareStyles(styles.root, style) }),
+	      children
+	    );
+	  }
+	});
+
+	exports.default = Toolbar;
+	module.exports = exports['default'];
+
+/***/ },
+/* 411 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(11);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _colors = __webpack_require__(308);
+
+	var _colors2 = _interopRequireDefault(_colors);
+
+	var _stylePropable = __webpack_require__(284);
+
+	var _stylePropable2 = _interopRequireDefault(_stylePropable);
+
+	var _getMuiTheme = __webpack_require__(311);
+
+	var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+	var ToolbarGroup = _react2.default.createClass({
+	  displayName: 'ToolbarGroup',
+
+	  propTypes: {
+	    /**
+	     * Can be any node or number of nodes.
+	     */
+	    children: _react2.default.PropTypes.node,
+
+	    /**
+	     * The css class name of the root element.
+	     */
+	    className: _react2.default.PropTypes.string,
+
+	    /**
+	     * Set this to true for if the `ToolbarGroup` is the first child of `Toolbar`
+	     * to prevent setting the left gap.
+	     */
+	    firstChild: _react2.default.PropTypes.bool,
+
+	    /**
+	     * Determines the side the `ToolbarGroup` will snap to. Either 'left' or 'right'.
+	     */
+	    float: _react2.default.PropTypes.oneOf(['left', 'right']),
+
+	    /**
+	     * Set this to true for if the `ToolbarGroup` is the last child of `Toolbar`
+	     * to prevent setting the right gap.
+	     */
+	    lastChild: _react2.default.PropTypes.bool,
+
+	    /**
+	     * Override the inline-styles of the root element.
+	     */
+	    style: _react2.default.PropTypes.object
+	  },
+
+	  contextTypes: {
+	    muiTheme: _react2.default.PropTypes.object
+	  },
+
+	  //for passing default theme context to children
+	  childContextTypes: {
+	    muiTheme: _react2.default.PropTypes.object
+	  },
+
+	  mixins: [_stylePropable2.default],
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      firstChild: false,
+	      float: 'left',
+	      lastChild: false
+	    };
+	  },
+	  getInitialState: function getInitialState() {
+	    return {
+	      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
+	    };
+	  },
+	  getChildContext: function getChildContext() {
+	    return {
+	      muiTheme: this.state.muiTheme
+	    };
+	  },
+
+	  //to update theme inside state whenever a new theme is passed down
+	  //from the parent / owner using context
+	  componentWillReceiveProps: function componentWillReceiveProps(nextProps, nextContext) {
+	    var newMuiTheme = nextContext.muiTheme ? nextContext.muiTheme : this.state.muiTheme;
+	    this.setState({ muiTheme: newMuiTheme });
+	  },
+	  getTheme: function getTheme() {
+	    return this.state.muiTheme.toolbar;
+	  },
+	  getSpacing: function getSpacing() {
+	    return this.state.muiTheme.rawTheme.spacing;
+	  },
+	  getStyles: function getStyles() {
+	    var _props = this.props;
+	    var firstChild = _props.firstChild;
+	    var float = _props.float;
+	    var lastChild = _props.lastChild;
+
+	    var marginHorizontal = this.getSpacing().desktopGutter;
+	    var marginVertical = (this.getTheme().height - this.state.muiTheme.button.height) / 2;
+	    var styles = {
+	      root: {
+	        float: float,
+	        position: 'relative',
+	        marginLeft: firstChild ? -marginHorizontal : undefined,
+	        marginRight: lastChild ? -marginHorizontal : undefined
+	      },
+	      dropDownMenu: {
+	        root: {
+	          float: 'left',
+	          color: _colors2.default.lightBlack, // removes hover color change, we want to keep it
+	          display: 'inline-block',
+	          marginRight: this.getSpacing().desktopGutter
+	        },
+	        controlBg: {
+	          backgroundColor: this.getTheme().menuHoverColor,
+	          borderRadius: 0
+	        },
+	        underline: {
+	          display: 'none'
+	        }
+	      },
+	      button: {
+	        float: 'left',
+	        margin: marginVertical + 'px ' + marginHorizontal + 'px',
+	        position: 'relative'
+	      },
+	      icon: {
+	        root: {
+	          float: 'left',
+	          cursor: 'pointer',
+	          color: this.getTheme().iconColor,
+	          lineHeight: this.getTheme().height + 'px',
+	          paddingLeft: this.getSpacing().desktopGutter
+	        },
+	        hover: {
+	          color: _colors2.default.darkBlack
+	        }
+	      },
+	      span: {
+	        float: 'left',
+	        color: this.getTheme().iconColor,
+	        lineHeight: this.getTheme().height + 'px'
+	      }
+	    };
+
+	    return styles;
+	  },
+	  _handleMouseEnterDropDownMenu: function _handleMouseEnterDropDownMenu(e) {
+	    e.target.style.zIndex = this.getStyles().icon.hover.zIndex;
+	    e.target.style.color = this.getStyles().icon.hover.color;
+	  },
+	  _handleMouseLeaveDropDownMenu: function _handleMouseLeaveDropDownMenu(e) {
+	    e.target.style.zIndex = 'auto';
+	    e.target.style.color = this.getStyles().icon.root.color;
+	  },
+	  _handleMouseEnterFontIcon: function _handleMouseEnterFontIcon(e) {
+	    e.target.style.zIndex = this.getStyles().icon.hover.zIndex;
+	    e.target.style.color = this.getStyles().icon.hover.color;
+	  },
+	  _handleMouseLeaveFontIcon: function _handleMouseLeaveFontIcon(e) {
+	    e.target.style.zIndex = 'auto';
+	    e.target.style.color = this.getStyles().icon.root.color;
+	  },
+	  render: function render() {
+	    var _this = this;
+
+	    var _props2 = this.props;
+	    var children = _props2.children;
+	    var className = _props2.className;
+	    var style = _props2.style;
+
+	    var other = _objectWithoutProperties(_props2, ['children', 'className', 'style']);
+
+	    var styles = this.getStyles();
+	    var newChildren = _react2.default.Children.map(children, function (currentChild) {
+	      if (!currentChild) {
+	        return null;
+	      }
+	      if (!currentChild.type) {
+	        return currentChild;
+	      }
+	      switch (currentChild.type.displayName) {
+	        case 'DropDownMenu':
+	          return _react2.default.cloneElement(currentChild, {
+	            style: _this.mergeStyles(styles.dropDownMenu.root, currentChild.props.style),
+	            styleControlBg: styles.dropDownMenu.controlBg,
+	            styleUnderline: styles.dropDownMenu.underline
+	          });
+	        case 'DropDownIcon':
+	          return _react2.default.cloneElement(currentChild, {
+	            style: _this.mergeStyles({ float: 'left' }, currentChild.props.style),
+	            iconStyle: styles.icon.root,
+	            onMouseEnter: _this._handleMouseEnterDropDownMenu,
+	            onMouseLeave: _this._handleMouseLeaveDropDownMenu
+	          });
+	        case 'RaisedButton':
+	        case 'FlatButton':
+	          return _react2.default.cloneElement(currentChild, {
+	            style: _this.mergeStyles(styles.button, currentChild.props.style)
+	          });
+	        case 'FontIcon':
+	          return _react2.default.cloneElement(currentChild, {
+	            style: _this.mergeStyles(styles.icon.root, currentChild.props.style),
+	            onMouseEnter: _this._handleMouseEnterFontIcon,
+	            onMouseLeave: _this._handleMouseLeaveFontIcon
+	          });
+	        case 'ToolbarSeparator':
+	        case 'ToolbarTitle':
+	          return _react2.default.cloneElement(currentChild, {
+	            style: _this.mergeStyles(styles.span, currentChild.props.style)
+	          });
+	        default:
+	          return currentChild;
+	      }
+	    }, this);
+
+	    return _react2.default.createElement(
+	      'div',
+	      _extends({}, other, { className: className, style: this.prepareStyles(styles.root, style) }),
+	      newChildren
+	    );
+	  }
+	});
+
+	exports.default = ToolbarGroup;
+	module.exports = exports['default'];
+
+/***/ },
+/* 412 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(11);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _stylePropable = __webpack_require__(284);
+
+	var _stylePropable2 = _interopRequireDefault(_stylePropable);
+
+	var _getMuiTheme = __webpack_require__(311);
+
+	var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+	var ToolbarSeparator = _react2.default.createClass({
+	  displayName: 'ToolbarSeparator',
+
+	  propTypes: {
+	    /**
+	     * The css class name of the root element.
+	     */
+	    className: _react2.default.PropTypes.string,
+
+	    /**
+	     * Override the inline-styles of the root element.
+	     */
+	    style: _react2.default.PropTypes.object
+	  },
+
+	  contextTypes: {
+	    muiTheme: _react2.default.PropTypes.object
+	  },
+
+	  //for passing default theme context to children
+	  childContextTypes: {
+	    muiTheme: _react2.default.PropTypes.object
+	  },
+
+	  mixins: [_stylePropable2.default],
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
+	    };
+	  },
+	  getChildContext: function getChildContext() {
+	    return {
+	      muiTheme: this.state.muiTheme
+	    };
+	  },
+
+	  //to update theme inside state whenever a new theme is passed down
+	  //from the parent / owner using context
+	  componentWillReceiveProps: function componentWillReceiveProps(nextProps, nextContext) {
+	    var newMuiTheme = nextContext.muiTheme ? nextContext.muiTheme : this.state.muiTheme;
+	    this.setState({ muiTheme: newMuiTheme });
+	  },
+	  getTheme: function getTheme() {
+	    return this.state.muiTheme.toolbar;
+	  },
+	  getSpacing: function getSpacing() {
+	    return this.state.muiTheme.rawTheme.spacing;
+	  },
+	  getStyles: function getStyles() {
+	    return {
+	      root: {
+	        backgroundColor: this.getTheme().separatorColor,
+	        display: 'inline-block',
+	        height: this.getSpacing().desktopGutterMore,
+	        marginLeft: this.getSpacing().desktopGutter,
+	        position: 'relative',
+	        top: (this.getTheme().height - this.getSpacing().desktopGutterMore) / 2,
+	        width: 1
+	      }
+	    };
+	  },
+	  render: function render() {
+	    var _props = this.props;
+	    var className = _props.className;
+	    var style = _props.style;
+
+	    var other = _objectWithoutProperties(_props, ['className', 'style']);
+
+	    var styles = this.getStyles();
+
+	    return _react2.default.createElement('span', _extends({}, other, { className: className, style: this.prepareStyles(styles.root, style) }));
+	  }
+	});
+
+	exports.default = ToolbarSeparator;
+	module.exports = exports['default'];
+
+/***/ },
+/* 413 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(11);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _stylePropable = __webpack_require__(284);
+
+	var _stylePropable2 = _interopRequireDefault(_stylePropable);
+
+	var _getMuiTheme = __webpack_require__(311);
+
+	var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+	var ToolbarTitle = _react2.default.createClass({
+	  displayName: 'ToolbarTitle',
+
+	  propTypes: {
+	    /**
+	     * The css class name of the root element.
+	     */
+	    className: _react2.default.PropTypes.string,
+
+	    /**
+	     * Override the inline-styles of the root element.
+	     */
+	    style: _react2.default.PropTypes.object,
+
+	    /**
+	     * The text to be displayed.
+	     */
+	    text: _react2.default.PropTypes.string
+	  },
+
+	  contextTypes: {
+	    muiTheme: _react2.default.PropTypes.object
+	  },
+
+	  //for passing default theme context to children
+	  childContextTypes: {
+	    muiTheme: _react2.default.PropTypes.object
+	  },
+
+	  mixins: [_stylePropable2.default],
+
+	  getInitialState: function getInitialState() {
+	    return {
+	      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)()
+	    };
+	  },
+	  getChildContext: function getChildContext() {
+	    return {
+	      muiTheme: this.state.muiTheme
+	    };
+	  },
+
+	  //to update theme inside state whenever a new theme is passed down
+	  //from the parent / owner using context
+	  componentWillReceiveProps: function componentWillReceiveProps(nextProps, nextContext) {
+	    var newMuiTheme = nextContext.muiTheme ? nextContext.muiTheme : this.state.muiTheme;
+	    this.setState({ muiTheme: newMuiTheme });
+	  },
+	  getTheme: function getTheme() {
+	    return this.state.muiTheme.toolbar;
+	  },
+	  getSpacing: function getSpacing() {
+	    return this.state.muiTheme.rawTheme.spacing;
+	  },
+	  getStyles: function getStyles() {
+	    return {
+	      root: {
+	        paddingRight: this.getSpacing().desktopGutterLess,
+	        lineHeight: this.getTheme().height + 'px',
+	        fontSize: this.getTheme().titleFontSize + 'px',
+	        display: 'inline-block',
+	        position: 'relative'
+	      }
+	    };
+	  },
+	  render: function render() {
+	    var _props = this.props;
+	    var className = _props.className;
+	    var style = _props.style;
+	    var text = _props.text;
+
+	    var other = _objectWithoutProperties(_props, ['className', 'style', 'text']);
+
+	    var styles = this.getStyles();
+
+	    return _react2.default.createElement(
+	      'span',
+	      _extends({}, other, { className: className, style: this.prepareStyles(styles.root, style) }),
+	      text
+	    );
+	  }
+	});
+
+	exports.default = ToolbarTitle;
+	module.exports = exports['default'];
+
+/***/ },
+/* 414 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(11);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactAddonsPureRenderMixin = __webpack_require__(280);
+
+	var _reactAddonsPureRenderMixin2 = _interopRequireDefault(_reactAddonsPureRenderMixin);
+
+	var _svgIcon = __webpack_require__(362);
+
+	var _svgIcon2 = _interopRequireDefault(_svgIcon);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var NavigationApps = _react2.default.createClass({
+	  displayName: 'NavigationApps',
+
+	  mixins: [_reactAddonsPureRenderMixin2.default],
+
+	  render: function render() {
+	    return _react2.default.createElement(
+	      _svgIcon2.default,
+	      this.props,
+	      _react2.default.createElement('path', { d: 'M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z' })
+	    );
+	  }
+	});
+
+	exports.default = NavigationApps;
+	module.exports = exports['default'];
+
+/***/ },
+/* 415 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(11);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactDom = __webpack_require__(168);
+
+	var _reactDom2 = _interopRequireDefault(_reactDom);
+
+	var _stylePropable = __webpack_require__(284);
+
+	var _stylePropable2 = _interopRequireDefault(_stylePropable);
+
+	var _events = __webpack_require__(345);
+
+	var _events2 = _interopRequireDefault(_events);
+
+	var _propTypes = __webpack_require__(283);
+
+	var _propTypes2 = _interopRequireDefault(_propTypes);
+
+	var _menu = __webpack_require__(398);
+
+	var _menu2 = _interopRequireDefault(_menu);
+
+	var _getMuiTheme = __webpack_require__(311);
+
+	var _getMuiTheme2 = _interopRequireDefault(_getMuiTheme);
+
+	var _popover = __webpack_require__(400);
+
+	var _popover2 = _interopRequireDefault(_popover);
+
+	var _warning = __webpack_require__(172);
+
+	var _warning2 = _interopRequireDefault(_warning);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+	var IconMenu = _react2.default.createClass({
+	  displayName: 'IconMenu',
+
+	  propTypes: {
+	    /**
+	     * This is the point on the icon where the menu
+	     * targetOrigin will stick to.
+	     * Options:
+	     * vertical: [top, middle, bottom]
+	     * horizontal: [left, center, right].
+	     */
+	    anchorOrigin: _propTypes2.default.origin,
+
+	    /**
+	     * Should be used to pass `MenuItem` components.
+	     */
+	    children: _react2.default.PropTypes.node,
+
+	    /**
+	     * The css class name of the root element.
+	     */
+	    className: _react2.default.PropTypes.string,
+
+	    /**
+	     * If true, menu will close after an item is touchTapped.
+	     */
+	    closeOnItemTouchTap: _react2.default.PropTypes.bool,
+
+	    /**
+	     * This is the IconButton to render. This button will open the menu.
+	     */
+	    iconButtonElement: _react2.default.PropTypes.element.isRequired,
+
+	    /**
+	     * The style object to use to override underlying icon style.
+	     */
+	    iconStyle: _react2.default.PropTypes.object,
+
+	    /**
+	     * The style object to use to override underlying menu style.
+	     */
+	    menuStyle: _react2.default.PropTypes.object,
+
+	    /**
+	     * Fired when a menu item is touchTapped.
+	     */
+	    onItemTouchTap: _react2.default.PropTypes.func,
+
+	    /**
+	     * Fired when keyobard focuses on element.
+	     */
+	    onKeyboardFocus: _react2.default.PropTypes.func,
+
+	    /**
+	     * Fired when mouse is pressed on element.
+	     */
+	    onMouseDown: _react2.default.PropTypes.func,
+
+	    /**
+	     * Fired when mouse enters the element.
+	     */
+	    onMouseEnter: _react2.default.PropTypes.func,
+
+	    /**
+	     * Fired when mouse leaves the element.
+	     */
+	    onMouseLeave: _react2.default.PropTypes.func,
+
+	    /**
+	     * Fired when mouse is lifted inside the element.
+	     */
+	    onMouseUp: _react2.default.PropTypes.func,
+
+	    /**
+	     * Callback function that is fired when the open state
+	     * of the menu is requested to be changed. The provided
+	     * open argument determines whether the menu is requested
+	     * to be opened or closed. Also, the reason argument states
+	     * why the menu got closed or opened. It can be 'keyboard',
+	     * 'iconTap' for open action and 'enter', 'escape', 'itemTap',
+	     * 'clickAway' for close action.
+	     */
+	    onRequestChange: _react2.default.PropTypes.func,
+
+	    /**
+	     * Fired when element is touch tapped.
+	     */
+	    onTouchTap: _react2.default.PropTypes.func,
+
+	    /**
+	     * Controls whether the IconMenu is opened or not.
+	     */
+	    open: _react2.default.PropTypes.bool,
+
+	    /**
+	     * Override the inline-styles of the root element.
+	     */
+	    style: _react2.default.PropTypes.object,
+
+	    /**
+	     * This is the point on the menu which will stick to the menu
+	     * origin.
+	     * Options:
+	     * vertical: [top, middle, bottom]
+	     * horizontal: [left, center, right].
+	     */
+	    targetOrigin: _propTypes2.default.origin,
+
+	    /**
+	     * Sets the delay in milliseconds before closing the
+	     * menu when an item is clicked.
+	     */
+	    touchTapCloseDelay: _react2.default.PropTypes.number
+	  },
+
+	  contextTypes: {
+	    muiTheme: _react2.default.PropTypes.object
+	  },
+
+	  //for passing default theme context to children
+	  childContextTypes: {
+	    muiTheme: _react2.default.PropTypes.object
+	  },
+
+	  mixins: [_stylePropable2.default],
+
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      closeOnItemTouchTap: true,
+	      open: null,
+	      onItemTouchTap: function onItemTouchTap() {},
+	      onKeyboardFocus: function onKeyboardFocus() {},
+	      onMouseDown: function onMouseDown() {},
+	      onMouseLeave: function onMouseLeave() {},
+	      onMouseEnter: function onMouseEnter() {},
+	      onMouseUp: function onMouseUp() {},
+	      onTouchTap: function onTouchTap() {},
+	      onRequestChange: function onRequestChange() {},
+	      anchorOrigin: {
+	        vertical: 'top',
+	        horizontal: 'left'
+	      },
+	      targetOrigin: {
+	        vertical: 'top',
+	        horizontal: 'left'
+	      },
+	      touchTapCloseDelay: 200
+	    };
+	  },
+	  getInitialState: function getInitialState() {
+	    if (process.env.NODE_ENV !== 'production') {
+	      this._warningIfNeeded();
+	    }
+
+	    return {
+	      muiTheme: this.context.muiTheme || (0, _getMuiTheme2.default)(),
+	      iconButtonRef: this.props.iconButtonElement.props.ref || 'iconButton',
+	      menuInitiallyKeyboardFocused: false,
+	      open: false
+	    };
+	  },
+	  getChildContext: function getChildContext() {
+	    return {
+	      muiTheme: this.state.muiTheme
+	    };
+	  },
+
+	  //to update theme inside state whenever a new theme is passed down
+	  //from the parent / owner using context
+	  componentWillReceiveProps: function componentWillReceiveProps(nextProps, nextContext) {
+	    if (process.env.NODE_ENV !== 'production') {
+	      this._warningIfNeeded();
+	    }
+
+	    var newMuiTheme = nextContext.muiTheme ? nextContext.muiTheme : this.state.muiTheme;
+	    this.setState({ muiTheme: newMuiTheme });
+
+	    if (nextProps.open === true || nextProps.open === false) {
+	      this.setState({ open: nextProps.open });
+	    }
+	  },
+	  componentWillUnmount: function componentWillUnmount() {
+	    if (this._timeout) clearTimeout(this._timeout);
+	  },
+	  _warningIfNeeded: function _warningIfNeeded() {
+	    if (this.props.hasOwnProperty('open')) {
+	      process.env.NODE_ENV !== "production" ? (0, _warning2.default)(this.props.hasOwnProperty('closeOnItemTouchTap'), 'closeOnItemTouchTap has been deprecated in favor of open, onRequestChange') : undefined;
+	    }
+	  },
+	  isOpen: function isOpen() {
+	    return this.state.open;
+	  },
+	  close: function close(reason, isKeyboard) {
+	    var _this = this;
+
+	    if (!this.state.open) {
+	      return;
+	    }
+
+	    if (this.props.open !== null) {
+	      this.props.onRequestChange(false, reason);
+	    }
+
+	    this.setState({ open: false }, function () {
+	      //Set focus on the icon button when the menu close
+	      if (isKeyboard) {
+	        var iconButton = _this.refs[_this.state.iconButtonRef];
+	        _reactDom2.default.findDOMNode(iconButton).focus();
+	        iconButton.setKeyboardFocus();
+	      }
+	    });
+	  },
+	  open: function open(reason, event) {
+	    if (this.props.open !== null) {
+	      this.props.onRequestChange(true, reason);
+
+	      return this.setState({
+	        menuInitiallyKeyboardFocused: _events2.default.isKeyboard(event),
+	        anchorEl: event.currentTarget
+	      });
+	    }
+
+	    this.setState({
+	      open: true,
+	      menuInitiallyKeyboardFocused: _events2.default.isKeyboard(event),
+	      anchorEl: event.currentTarget
+	    });
+
+	    event.preventDefault();
+	  },
+	  _handleItemTouchTap: function _handleItemTouchTap(event, child) {
+	    var _this2 = this;
+
+	    if (this.props.closeOnItemTouchTap) {
+	      (function () {
+	        var isKeyboard = _events2.default.isKeyboard(event);
+	        _this2._timeout = setTimeout(function () {
+	          if (!_this2.isMounted()) {
+	            return;
+	          }
+
+	          _this2.close(isKeyboard ? 'enter' : 'itemTap', isKeyboard);
+	        }, _this2.props.touchTapCloseDelay);
+	      })();
+	    }
+
+	    this.props.onItemTouchTap(event, child);
+	  },
+	  _handleMenuEscKeyDown: function _handleMenuEscKeyDown(event) {
+	    this.close('escape', event);
+	  },
+	  render: function render() {
+	    var _this3 = this;
+
+	    var _props = this.props;
+	    var anchorOrigin = _props.anchorOrigin;
+	    var className = _props.className;
+	    var closeOnItemTouchTap = _props.closeOnItemTouchTap;
+	    var iconButtonElement = _props.iconButtonElement;
+	    var iconStyle = _props.iconStyle;
+	    var onItemTouchTap = _props.onItemTouchTap;
+	    var onKeyboardFocus = _props.onKeyboardFocus;
+	    var onMouseDown = _props.onMouseDown;
+	    var onMouseLeave = _props.onMouseLeave;
+	    var onMouseEnter = _props.onMouseEnter;
+	    var onMouseUp = _props.onMouseUp;
+	    var onTouchTap = _props.onTouchTap;
+	    var menuStyle = _props.menuStyle;
+	    var style = _props.style;
+	    var targetOrigin = _props.targetOrigin;
+
+	    var other = _objectWithoutProperties(_props, ['anchorOrigin', 'className', 'closeOnItemTouchTap', 'iconButtonElement', 'iconStyle', 'onItemTouchTap', 'onKeyboardFocus', 'onMouseDown', 'onMouseLeave', 'onMouseEnter', 'onMouseUp', 'onTouchTap', 'menuStyle', 'style', 'targetOrigin']);
+
+	    var _state = this.state;
+	    var open = _state.open;
+	    var anchorEl = _state.anchorEl;
+
+	    var styles = {
+	      root: {
+	        display: 'inline-block',
+	        position: 'relative'
+	      },
+
+	      menu: {
+	        position: 'relative'
+	      }
+	    };
+
+	    var mergedRootStyles = this.mergeStyles(styles.root, style);
+	    var mergedMenuStyles = this.mergeStyles(styles.menu, menuStyle);
+
+	    var iconButton = _react2.default.cloneElement(iconButtonElement, {
+	      onKeyboardFocus: this.props.onKeyboardFocus,
+	      iconStyle: this.mergeStyles(iconStyle, iconButtonElement.props.iconStyle),
+	      onTouchTap: function onTouchTap(e) {
+	        _this3.open(_events2.default.isKeyboard(e) ? 'keyboard' : 'iconTap', e);
+	        if (iconButtonElement.props.onTouchTap) iconButtonElement.props.onTouchTap(e);
+	      },
+	      ref: this.state.iconButtonRef
+	    });
+
+	    var menu = _react2.default.createElement(
+	      _menu2.default,
+	      _extends({}, other, {
+	        animateOpen: true,
+	        initiallyKeyboardFocused: this.state.menuInitiallyKeyboardFocused,
+	        onEscKeyDown: this._handleMenuEscKeyDown,
+	        onItemTouchTap: this._handleItemTouchTap,
+	        zDepth: 0,
+	        style: mergedMenuStyles
+	      }),
+	      this.props.children
+	    );
+
+	    return _react2.default.createElement(
+	      'div',
+	      {
+	        className: className,
+	        onMouseDown: onMouseDown,
+	        onMouseLeave: onMouseLeave,
+	        onMouseEnter: onMouseEnter,
+	        onMouseUp: onMouseUp,
+	        onTouchTap: onTouchTap,
+	        style: this.prepareStyles(mergedRootStyles)
+	      },
+	      iconButton,
+	      _react2.default.createElement(
+	        _popover2.default,
+	        {
+	          anchorOrigin: anchorOrigin,
+	          targetOrigin: targetOrigin,
+	          open: open,
+	          anchorEl: anchorEl,
+	          childContextTypes: this.constructor.childContextTypes,
+	          useLayerForClickAway: false,
+	          onRequestClose: this.close,
+	          context: this.context
+	        },
+	        menu
+	      )
+	    );
+	  }
+	});
+
+	exports.default = IconMenu;
+	module.exports = exports['default'];
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
+
+/***/ },
+/* 416 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
@@ -46587,7 +47715,7 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
-	var _appBar = __webpack_require__(411);
+	var _appBar = __webpack_require__(417);
 
 	var _appBar2 = _interopRequireDefault(_appBar);
 
@@ -46595,19 +47723,19 @@
 
 	var _iconButton2 = _interopRequireDefault(_iconButton);
 
-	var _close = __webpack_require__(413);
+	var _close = __webpack_require__(419);
 
 	var _close2 = _interopRequireDefault(_close);
 
-	var _arrowBack = __webpack_require__(414);
+	var _arrowBack = __webpack_require__(420);
 
 	var _arrowBack2 = _interopRequireDefault(_arrowBack);
 
-	var _theme = __webpack_require__(415);
+	var _theme = __webpack_require__(421);
 
 	var _theme2 = _interopRequireDefault(_theme);
 
-	var _themeManager = __webpack_require__(416);
+	var _themeManager = __webpack_require__(422);
 
 	var _themeManager2 = _interopRequireDefault(_themeManager);
 
@@ -46670,7 +47798,7 @@
 	});
 
 /***/ },
-/* 411 */
+/* 417 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -46697,7 +47825,7 @@
 
 	var _iconButton2 = _interopRequireDefault(_iconButton);
 
-	var _menu = __webpack_require__(412);
+	var _menu = __webpack_require__(418);
 
 	var _menu2 = _interopRequireDefault(_menu);
 
@@ -47042,7 +48170,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(14)))
 
 /***/ },
-/* 412 */
+/* 418 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -47083,7 +48211,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 413 */
+/* 419 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -47124,7 +48252,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 414 */
+/* 420 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -47165,7 +48293,7 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 415 */
+/* 421 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -47213,7 +48341,7 @@
 	};
 
 /***/ },
-/* 416 */
+/* 422 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -47259,43 +48387,46 @@
 	module.exports = exports['default'];
 
 /***/ },
-/* 417 */
+/* 423 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	  value: true
 	});
 
 	exports.default = function () {
-	    var state = arguments.length <= 0 || arguments[0] === undefined ? (0, _immutable.Map)() : arguments[0];
-	    var action = arguments[1];
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? (0, _immutable.Map)() : arguments[0];
+	  var action = arguments[1];
 
-	    var newState = state;
-	    switch (action.type) {
-	        case c.SET_STATE:
-	            newState = state.mergeDeep(getInitialState(action.state));
-	            break;
-	        case c.REQUEST_COMPONENT_SUCCESS:
-	            newState = state.mergeDeep(getStateFromPayload(action.payload));
-	            break;
-	        case c.REQUEST_COMPONENT_FAILURE:
-	            newState = null;
-	            break;
-	        case c.EDIT_PARAMETER:
-	            newState = editParameter(state, action);
-	            break;
-	        case c.RELOAD:
-	            newState = reload(state, action);
-	            break;
-	        default:
-	            newState = state;
-	    }
-	    return newState;
+	  var newState = state;
+	  switch (action.type) {
+	    case c.SET_STATE:
+	      newState = state.mergeDeep(getInitialState(action.state));
+	      break;
+	    case c.REQUEST_COMPONENT_SUCCESS:
+	      newState = state.mergeDeep(getStateFromPayload(action.payload));
+	      break;
+	    case c.REQUEST_LOCAL_COMPONENT_SUCCESS:
+	      newState = state.mergeDeep(getStateFromLocalPayload(action.payload));
+	      break;
+	    case c.REQUEST_COMPONENT_FAILURE:
+	      newState = null;
+	      break;
+	    case c.EDIT_PARAMETER:
+	      newState = editParameter(state, action);
+	      break;
+	    case c.RELOAD:
+	      newState = reload(state, action);
+	      break;
+	    default:
+	      newState = state;
+	  }
+	  return newState;
 	};
 
-	var _immutable = __webpack_require__(418);
+	var _immutable = __webpack_require__(424);
 
 	var _constants = __webpack_require__(275);
 
@@ -47304,36 +48435,51 @@
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function getStateFromPayload(payload) {
-	    var amend = {};
-	    amend[payload.name] = {
-	        versions: payload.allVersions
-	    };
-	    amend[payload.name][payload.version] = {
-	        description: payload.description,
-	        repository: payload.repository,
-	        parameters: payload.oc.parameters
-	    };
-	    return amend;
+	  var amend = {};
+	  amend[payload.name] = {
+	    versions: payload.allVersions
+	  };
+	  amend[payload.name][payload.version] = {
+	    description: payload.description,
+	    repository: payload.repository,
+	    parameters: payload.oc.parameters
+	  };
+	  return amend;
+	}
+
+	function getStateFromLocalPayload(payload) {
+	  var amend = {};
+	  amend[payload.name] = {
+	    versions: payload.allVersions,
+	    baseHref: 'http://localhost:3000/' + payload.name + '/',
+	    registryHref: "http://localhost:3000/"
+	  };
+	  amend[payload.name]['local'] = {
+	    description: payload.description,
+	    repository: payload.repository,
+	    parameters: payload.oc.parameters
+	  };
+	  return amend;
 	}
 	function getInitialState(initialState) {
-	    var amend = initialState;
-	    var componentKeys = Object.keys(initialState);
-	    componentKeys.forEach(function (key) {
-	        amend[key].renderedComponent._originalParameters = amend[key].renderedComponent.parameters;
-	    });
-	    return amend;
+	  var amend = initialState;
+	  var componentKeys = Object.keys(initialState);
+	  componentKeys.forEach(function (key) {
+	    amend[key].renderedComponent._originalParameters = amend[key].renderedComponent.parameters;
+	  });
+	  return amend;
 	}
 
 	function editParameter(state, action) {
-	    return state.setIn([action.component, 'renderedComponent', 'parameters', action.parameter], action.value);
+	  return state.setIn([action.component, 'renderedComponent', 'parameters', action.parameter], action.value);
 	}
 	function reload(state, action) {
-	    var originalParameters = state.getIn([action.component, 'renderedComponent', '_originalParameters']);
-	    return state.setIn([action.component, 'renderedComponent', 'parameters'], originalParameters);
+	  var originalParameters = state.getIn([action.component, 'renderedComponent', '_originalParameters']);
+	  return state.setIn([action.component, 'renderedComponent', 'parameters'], originalParameters);
 	}
 
 /***/ },
-/* 418 */
+/* 424 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**

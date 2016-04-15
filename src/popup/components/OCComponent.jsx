@@ -12,10 +12,37 @@ import TextField from 'material-ui/lib/text-field';
 import SelectField from 'material-ui/lib/select-field';
 import MenuItem from 'material-ui/lib/menus/menu-item';
 import Divider from 'material-ui/lib/divider';
+import DropDownMenu from 'material-ui/lib/DropDownMenu';
+import Toolbar from 'material-ui/lib/toolbar/toolbar';
+import ToolbarGroup from 'material-ui/lib/toolbar/toolbar-group';
+import ToolbarSeparator from 'material-ui/lib/toolbar/toolbar-separator';
+import ToolbarTitle from 'material-ui/lib/toolbar/toolbar-title';
+import AppIcon from 'material-ui/lib/svg-icons/navigation/apps.js';
+import IconButton from 'material-ui/lib/icon-button';
+import IconMenu from 'material-ui/lib/menus/icon-menu';
+
 
 class OCComponent extends Component {
   constructor(props) {
     super(props);
+  }
+
+  openRegistry() {
+    return ()=> {
+      chrome.tabs.create({url: this.props.registryHref});
+    }
+  }
+
+  openComponent() {
+    return ()=> {
+      chrome.tabs.create({url: `${this.props.baseHref}${this.props.version}/~info`});
+    }
+  }
+
+  openRepository() {
+    return ()=> {
+      chrome.tabs.create({url: this.props.metadata.repository});
+    }
   }
 
   render() {
@@ -49,8 +76,6 @@ class OCComponent extends Component {
     registryParameterKeys.forEach(function(key) {
       var registryParameter = registryParameters[key];
       var providedParameter = providedParameters[key];
-      var selected = (registryParameter.mandatory || providedParameter != null) ? true : false;
-      var selectable = !registryParameter.mandatory;
 
       parameters.push(
         <TableRow key={key} displayBorder={false}>
@@ -60,26 +85,31 @@ class OCComponent extends Component {
         </TableRow>
       );
     });
-    const versions = [];
-    this.props.versions.forEach(function(version) {
-      versions.push(
-        <MenuItem key={version} value={version} primaryText={version}/>
-      );
-    });
     return (
-      <div style={{'paddingLeft':1+'rem'}}>
-        <div>
-          <h2 style={{float:'left', 'marginTop':1.55+'rem','marginBottom':0}}>{name}</h2>
-          <SelectField
-            style={{float:'right'}}
-            floatingLabelText='Version'
-            value={this.props.version}
-            onChange={(_,__,v)=>this.props.changeVersion(v)}
-          >
-            {versions}
-          </SelectField>
-        </div>
-        <div style={{clear:'both', 'paddingTop':'2rem'}}>
+      <div>
+        <Toolbar>
+          <ToolbarGroup firstChild={true} float="left">
+            <ToolbarTitle text={name} style={{paddingLeft:'1rem'}}/>
+            <DropDownMenu value={this.props.version}>
+              {this.props.versions.map(version=> <MenuItem key={version} value={version} primaryText={version}/>)}
+            </DropDownMenu>
+          </ToolbarGroup>
+          <ToolbarGroup float="right">
+            <IconMenu iconButtonElement={
+              <IconButton touch={true}>
+                <AppIcon />
+              </IconButton>
+            }>
+              <MenuItem primaryText="Switch to Local" onTouchTap={this.props.switchToLocal}/>
+              <Divider />
+              <MenuItem primaryText="Go to Registry" onTouchTap={this.openRegistry()}/>
+              <MenuItem primaryText="Go to Component Info" onTouchTap={this.openComponent()}/>
+              <MenuItem primaryText="Go to Repository" onTouchTap={this.openRepository()}/>
+            </IconMenu>
+
+          </ToolbarGroup>
+        </Toolbar>
+        <div style={{'paddingLeft':1+'rem'}}>
           <Table multiSelectable={false} selectable={false}>
             <TableHeader adjustForCheckbox={false}
                          displaySelectAll={false}
