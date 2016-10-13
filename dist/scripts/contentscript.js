@@ -74,8 +74,11 @@
 	      parsedHref.protocol = location.protocol;
 	    }
 	    var baseHref = parsedHref.protocol + '//' + parsedHref.host + removeVersion(name, parsedHref.pathname);
+	    var registryHref = baseHref.replace(name + '/', '');
+
 	    state[name] = {};
 	    state[name].baseHref = baseHref;
+	    state[name].registryHref = registryHref;
 	    state[name].renderedComponent = {};
 	    state[name].renderedComponent.version = component.getAttribute('data-version');
 	    state[name].renderedComponent.parameters = parsedHref.query;
@@ -86,10 +89,19 @@
 	function updateComponents(msg) {
 	  var ocComponents = document.getElementsByTagName('oc-component');
 	  [].forEach.call(ocComponents, function (component) {
+	    function getHref() {
+	      if (msg.version == 'local') {
+	        return msg.baseHref + '?' + qs.stringify(msg.parameters);
+	      } else {
+	        return '' + msg.baseHref + msg.version + '/?' + qs.stringify(msg.parameters);
+	      }
+	    }
+
 	    if (component.getAttribute('data-name') == msg.name) {
 	      component.setAttribute('data-version', msg.version);
 	      component.setAttribute('data-rendered', 'false');
-	      component.setAttribute('href', '' + msg.baseHref + msg.version + '/?' + qs.stringify(msg.parameters));
+	      var newHref = getHref();
+	      component.setAttribute('href', newHref);
 	      var script = document.createElement('script');
 	      script.appendChild(document.createTextNode('window.oc.renderUnloadedComponents()'));
 	      (document.body || document.head || document.documentElement).appendChild(script);
