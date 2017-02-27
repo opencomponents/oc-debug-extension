@@ -4,7 +4,7 @@
 
 ## Getting Started
 
-1. Install WebPack `npm install WebPack -g`
+1. Install WebPack `npm install webpack -g`
 2. Install packages `npm install`
 3. Build extension package `webpack`
 4. Follow this `https://developer.chrome.com/extensions/getstarted#unpacked` to load an unpack extension from the `dist` folder of this repository
